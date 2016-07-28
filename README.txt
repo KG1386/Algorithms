@@ -1,0 +1,1 @@
+Repository with small algorithms that may come useful under specific circumstances
