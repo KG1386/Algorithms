@@ -1,6 +1,7 @@
 # Example of Naive Bayes implemented from Scratch in Python. Works as a classification technique based on
 # Bayes Theorem with an assumption of independence among predictors
-#
+# based on http://machinelearningmastery.com/naive-bayes-classifier-scratch-python/
+
 import csv
 import random
 import math
