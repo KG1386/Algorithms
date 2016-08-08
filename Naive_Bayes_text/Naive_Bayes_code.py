@@ -23,7 +23,6 @@ train_distribution = {
 }
 categories = []
 
-
 # Read all the files in the folder
 all_text_files = se.readAllFiles("sample_training_set")
 # Having all the files in the folder saved as string, go through each
@@ -58,16 +57,11 @@ for text_file in all_text_files:
             # Add occurrence data of the word into the list as well
             word_counts[category][word] += count
 
-# Obtain distribution of positive and negative reviews by finding percentage of each category
-train_dist_positive = (train_distribution["p"] / sum(train_distribution.values())) # devision of positive number of files/total files
-train_dist_negative = (train_distribution["n"] / sum(train_distribution.values()))
-
 # Find all text files in specified folder
 all_text_files = se.readAllFiles("sample_test_set")
 # Reset counters for successful predictions and number of files
 suc_counter = 0.0
 file_counter = 0.0
-
 
 # Go over all test files in the folder
 for text_file in all_text_files:
@@ -99,3 +93,5 @@ for text_file in all_text_files:
 
 # Show how good the prediction was
 print "Successful estimations:",((suc_counter/file_counter)*100),"%"
+print "Training data distribution:"
+print "Positive:", (train_distribution["p"] / sum(train_distribution.values())), "Negative:", (train_distribution["n"] / sum(train_distribution.values()))
