@@ -6,6 +6,7 @@ import csv
 import random
 import math
 import operator
+import Normalisation as norm
 
 # Normalises data before calculating distance
 def normalisation (training_set):
