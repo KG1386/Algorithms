@@ -8,33 +8,19 @@ import math
 import operator
 import Normalisation as norm
 
-# Normalises data before calculating distance
-def normalisation (training_set):
-    normalised_list = []
-    print range(len(training_set[0:(len(training_set[0])-1)]))
-    for x in range(len(training_set[0:(len(training_set[0])-1)])):
-        # print training_set[:][0:(len(training_set[x])-1)]
-        column = [item[x] for item in training_set]
-        min_val = min(column)
-        max_val = max(column)
-        for y in column:
-            print y
-            normalised = (y-min_val)/(max_val - min_val)
-            normalised_list.append(normalised)
-    return normalised_list
-
 
 def loadDataset(filename, split, trainingSet=[], testSet=[]):
     with open(filename, 'rb') as csvfile:
         lines = csv.reader(csvfile)
         dataset = list(lines)
-        for x in range(len(dataset) - 1):
-            for y in range(4):
-                dataset[x][y] = float(dataset[x][y])
+        print dataset
+        norm_dataset = norm.normaliseList(dataset)
+        print norm_dataset
+        for x in range(len(norm_dataset) - 1):
             if random.random() < split:
-                trainingSet.append(dataset[x])
+                trainingSet.append(norm_dataset[x])
             else:
-                testSet.append(dataset[x])
+                testSet.append(norm_dataset[x])
 
 
 def euclideanDistance(instance1, instance2, length):
@@ -81,15 +67,14 @@ def main():
     # prepare data
     trainingSet = []
     testSet = []
-    split = 0.9
+    split = 0.7
     loadDataset('iris.csv', split, trainingSet, testSet)
-    #normalised_train_set = normalisation(trainingSet)
     print 'Train set: ' + repr(len(trainingSet))
     print 'Test set: ' + repr(len(testSet))
     # generate predictions
     predictions = []
     k = 3
-    for x in range(len(trainingSet)):
+    for x in range(len(testSet)):
         neighbors = getNeighbors(trainingSet, testSet[x], k)
         result = getResponse(neighbors)
         predictions.append(result)
