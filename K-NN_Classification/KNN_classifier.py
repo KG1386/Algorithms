@@ -13,9 +13,7 @@ def loadDataset(filename, split, trainingSet=[], testSet=[]):
     with open(filename, 'rb') as csvfile:
         lines = csv.reader(csvfile)
         dataset = list(lines)
-        print dataset
         norm_dataset = norm.normaliseList(dataset)
-        print norm_dataset
         for x in range(len(norm_dataset) - 1):
             if random.random() < split:
                 trainingSet.append(norm_dataset[x])
@@ -26,7 +24,7 @@ def loadDataset(filename, split, trainingSet=[], testSet=[]):
 def euclideanDistance(instance1, instance2, length):
     distance = 0
     for x in range(length):
-        distance += pow((instance1[x] - instance2[x]), 2)
+        distance += pow(instance1[x] - instance2[x],2)
     return math.sqrt(distance)
 
 
@@ -38,20 +36,24 @@ def getNeighbors(trainingSet, testInstance, k):
         distances.append((trainingSet[x], dist))
     distances.sort(key=operator.itemgetter(1))
     neighbors = []
+    n_distances = []
     for x in range(k):
         neighbors.append(distances[x][0])
-    return neighbors
+        n_distances.append(distances[x][-1])
+    return neighbors,n_distances
 
-
-def getResponse(neighbors):
-    classVotes = {}
+# Obtain weighted sum for each category and return the smallest value
+def getResponse(neighbors,n_distances):
+    # Keeps weighted votes summary
+    classCount = {}
     for x in range(len(neighbors)):
         response = neighbors[x][-1]
-        if response in classVotes:
-            classVotes[response] += 1
+        if response in classCount:
+            classCount[response] += n_distances[x]
         else:
-            classVotes[response] = 1
-    sortedVotes = sorted(classVotes.iteritems(), key=operator.itemgetter(1), reverse=True)
+            classCount[response] = 1
+    # Sum all the counts for each class and pass the result
+    sortedVotes = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sortedVotes[0][0]
 
 
@@ -63,24 +65,30 @@ def getAccuracy(testSet, predictions):
     return (correct / float(len(testSet))) * 100.0
 
 
-def main():
+def main(k):
     # prepare data
     trainingSet = []
     testSet = []
-    split = 0.7
+    split = 0.8
     loadDataset('iris.csv', split, trainingSet, testSet)
     print 'Train set: ' + repr(len(trainingSet))
     print 'Test set: ' + repr(len(testSet))
     # generate predictions
     predictions = []
-    k = 3
+    # Entire dataset is reevaluated for each entry
     for x in range(len(testSet)):
-        neighbors = getNeighbors(trainingSet, testSet[x], k)
-        result = getResponse(neighbors)
+        neighbors,n_distances = getNeighbors(trainingSet, testSet[x], k)
+        result = getResponse(neighbors,n_distances)
         predictions.append(result)
-        print('> predicted=' + repr(result) + ', actual=' + repr(testSet[x][-1]))
+        # print('> predicted=' + repr(result) + ', actual=' + repr(testSet[x][-1]))
     accuracy = getAccuracy(testSet, predictions)
     print('Accuracy: ' + repr(accuracy) + '%')
+    return accuracy
 
-
-main()
+# max_acc = 0
+# for x in range(50):
+#     new_acc = main(x+1)
+#     if new_acc > max_acc:
+#         max_acc = new_acc
+#         print "New high", max_acc, "k value",x
+main(3)
