@@ -1,6 +1,8 @@
 # Main file of the algorithm. Contains calls to other functions not included here
 
-# Example of kNN implemented from Scratch in Python
+# Practical implementation of KNN algorithm with train and test data supplied by .csv
+# based on:
+# http://machinelearningmastery.com/tutorial-to-implement-k-nearest-neighbors-in-python-from-scratch/
 
 import csv
 import random
@@ -8,26 +10,25 @@ import math
 import operator
 import Normalisation as norm
 
-
-def loadDataset(filename, split, trainingSet=[], testSet=[]):
+# Function for loading the dataset into list
+def loadDataset(filename):
+    rawList =[]
     with open(filename, 'rb') as csvfile:
         lines = csv.reader(csvfile)
         dataset = list(lines)
         norm_dataset = norm.normaliseList(dataset)
         for x in range(len(norm_dataset) - 1):
-            if random.random() < split:
-                trainingSet.append(norm_dataset[x])
-            else:
-                testSet.append(norm_dataset[x])
+            rawList.append(norm_dataset[x])
+    return rawList
 
-
+# Function for calculating the distance between unknown point and its neighbour using euclidian formula
 def euclideanDistance(instance1, instance2, length):
     distance = 0
     for x in range(length):
-        distance += pow(instance1[x] - instance2[x],2)
+        distance += pow((instance1[x] - instance2[x]),2)
     return math.sqrt(distance)
 
-
+# Saves the neighbouring points and respective distances to them
 def getNeighbors(trainingSet, testInstance, k):
     distances = []
     length = len(testInstance) - 1
@@ -56,7 +57,7 @@ def getResponse(neighbors,n_distances):
     sortedVotes = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sortedVotes[0][0]
 
-
+# Compare predicted label and the actual label
 def getAccuracy(testSet, predictions):
     correct = 0
     for x in range(len(testSet)):
@@ -66,29 +67,20 @@ def getAccuracy(testSet, predictions):
 
 
 def main(k):
-    # prepare data
-    trainingSet = []
-    testSet = []
-    split = 0.8
-    loadDataset('iris.csv', split, trainingSet, testSet)
+    # Load data from .csv files
+    trainingSet = loadDataset('irisTrain.csv')
+    testSet = loadDataset('irisTest.csv')
     print 'Train set: ' + repr(len(trainingSet))
     print 'Test set: ' + repr(len(testSet))
-    # generate predictions
     predictions = []
     # Entire dataset is reevaluated for each entry
     for x in range(len(testSet)):
         neighbors,n_distances = getNeighbors(trainingSet, testSet[x], k)
         result = getResponse(neighbors,n_distances)
         predictions.append(result)
-        # print('> predicted=' + repr(result) + ', actual=' + repr(testSet[x][-1]))
+        print('> predicted=' + repr(result) + ', actual=' + repr(testSet[x][-1]))
     accuracy = getAccuracy(testSet, predictions)
     print('Accuracy: ' + repr(accuracy) + '%')
     return accuracy
 
-# max_acc = 0
-# for x in range(50):
-#     new_acc = main(x+1)
-#     if new_acc > max_acc:
-#         max_acc = new_acc
-#         print "New high", max_acc, "k value",x
 main(3)
