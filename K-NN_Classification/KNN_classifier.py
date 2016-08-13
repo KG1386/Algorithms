@@ -68,8 +68,8 @@ def getAccuracy(testSet, predictions):
 
 def main(k):
     # Load data from .csv files
-    trainingSet = loadDataset('irisTrain.csv')
-    testSet = loadDataset('irisTest.csv')
+    trainingSet = loadDataset('pima-indians-diabetes.Train.csv')
+    testSet = loadDataset('pima-indians-diabetes.Test.csv')
     print 'Train set: ' + repr(len(trainingSet))
     print 'Test set: ' + repr(len(testSet))
     predictions = []
@@ -83,4 +83,16 @@ def main(k):
     print('Accuracy: ' + repr(accuracy) + '%')
     return accuracy
 
-main(3)
+# Loop over specified range to find optimal K
+def findK(iter_base,iter_end):
+    max_acc = 0
+    for x in xrange(iter_base, iter_end):
+        acc = int(main(x+1))
+        if acc > max_acc:
+            max_acc = acc
+            best_k = x
+    return max_acc, best_k+1
+
+# Specify the starting and ending values of range where optimal k value will be searched for
+print "Best accuracy and K value:", findK(50,70)
+#main(14)
